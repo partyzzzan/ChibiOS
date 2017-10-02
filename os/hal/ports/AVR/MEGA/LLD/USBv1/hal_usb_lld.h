@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    hal_usb_lld.h
- * @brief   AVR USB subsystem low level driver header.
+ * @file    USBv1/hal_usb_lld.h
+ * @brief   AVR/MEGA USB subsystem low level driver header.
  *
  * @addtogroup USB
  * @{
@@ -361,6 +361,15 @@ struct USBDriver {
  * @api
  */
 #define usb_lld_disconnect_bus(usbp) (UDCON |= (1 << DETACH))
+
+/**
+ * @brief   Start of host wake-up procedure.
+ *
+ * @notapi
+ */
+#define usb_lld_wakeup_host(usbp)                                           \
+  do{                                                                       \
+  } while (true)
 
 /*===========================================================================*/
 /* External declarations.                                                    */

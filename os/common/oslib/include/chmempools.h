@@ -28,6 +28,10 @@
 #ifndef CHMEMPOOLS_H
 #define CHMEMPOOLS_H
 
+#if !defined(CH_CFG_USE_MEMPOOLS)
+#define CH_CFG_USE_MEMPOOLS                 FALSE
+#endif
+
 #if (CH_CFG_USE_MEMPOOLS == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
@@ -74,7 +78,7 @@ typedef struct {
  * @brief   Guarded memory pool descriptor.
  */
 typedef struct {
-  semaphore_t           sem;            /**< @brief Counter semaphore quarding
+  semaphore_t           sem;            /**< @brief Counter semaphore guarding
                                                     the memory pool.        */
   memory_pool_t         pool;           /**< @brief The memory pool itself. */
 } guarded_memory_pool_t;
@@ -247,6 +251,21 @@ static inline void chGuardedPoolAddI(guarded_memory_pool_t *gmp, void *objp) {
   chDbgCheckClassI();
 
   chGuardedPoolFreeI(gmp, objp);
+}
+
+/**
+ * @brief   Allocates an object from a guarded memory pool.
+ * @pre     The guarded memory pool must be already been initialized.
+ *
+ * @param[in] gmp       pointer to a @p guarded_memory_pool_t structure
+ * @return              The pointer to the allocated object.
+ * @retval NULL         if the operation timed out.
+ *
+ * @iclass
+ */
+static inline void *chGuardedPoolAllocI(guarded_memory_pool_t *gmp) {
+
+  return chPoolAllocI(&gmp->pool);
 }
 #endif /* CH_CFG_USE_SEMAPHORES == TRUE */
 

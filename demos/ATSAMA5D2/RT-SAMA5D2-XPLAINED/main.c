@@ -16,23 +16,20 @@
 
 #include "ch.h"
 #include "hal.h"
-
-static uint32_t seconds_counter;
-static uint32_t minutes_counter;
+#include "ch_test.h"
 
 /*
- * Seconds counter thread.
+ * LED blinker thread, times are in milliseconds.
  */
-static THD_WORKING_AREA(waThread1, 128);
+static THD_WORKING_AREA(waThread1, 512);
 static THD_FUNCTION(Thread1, arg) {
 
   (void)arg;
-
-  chRegSetThreadName("counter");
+  chRegSetThreadName("blinker");
 
   while (true) {
-    chThdSleepMilliseconds(1000);
-    seconds_counter++;
+    palToggleLine(LINE_LED_BLUE);
+    chThdSleepMilliseconds(500);
   }
 }
 
@@ -52,16 +49,25 @@ int main(void) {
   chSysInit();
 
   /*
-   * Creates the example thread.
+   * Activates the serial driver 0 using the driver default configuration.
+   */
+  sdStart(&SD0, NULL);
+
+  /* Redirecting  UART0 RX on PB26 and UART0 TX on PB 27. */
+  palSetGroupMode(PIOB, PAL_PORT_BIT(26) | PAL_PORT_BIT(27), 0U,
+                  PAL_SAMA_FUNC_PERIPH_C | PAL_MODE_SECURE);
+  /*
+   * Creates the blinker thread.
    */
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
   /*
    * Normal main() thread activity, in this demo it does nothing except
-   * increasing the minutes counter.
+   * sleeping in a loop and check the button state.
    */
   while (true) {
-    chThdSleepSeconds(60);
-    minutes_counter++;
+    if(!palReadPad(PIOB, PIOB_USER_PB))
+      test_execute((BaseSequentialStream *)&SD0);
+    chThdSleepMilliseconds(500);
   }
 }

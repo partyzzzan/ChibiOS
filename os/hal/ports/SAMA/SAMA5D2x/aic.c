@@ -82,7 +82,11 @@
  */
 void aicInit(void) {
 
+#if SAMA_HAL_IS_SECURE
   Aic *aic = SAIC;
+#else
+  Aic *aic = AIC;
+#endif
 
   unsigned i;
   /* Disable all interrupts */

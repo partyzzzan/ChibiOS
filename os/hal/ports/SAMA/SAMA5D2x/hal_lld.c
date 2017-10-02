@@ -59,7 +59,18 @@
  * @notapi
  */
 void hal_lld_init(void) {
-#if defined(SAMA5_DMA_REQUIRED)
+
+  /* Disabling PMC write protection. */
+  pmcDisableWP();
+
+  /* Enabling matrix clock */
+  pmcEnableH32MX();
+  pmcEnableH64MX();
+
+  /* Enabling write protection.  */
+  pmcEnableWP();
+
+#if defined(SAMA_DMA_REQUIRED)
   dmaInit();
 #endif
   /* Advanced interrupt controller init */
@@ -79,8 +90,9 @@ void sama_clock_init(void) {
   /* Disabling PMC write protection. */
   pmcDisableWP();
 
-  /* Enforces the reset default configuration of clock tree. */
-{
+  /* 
+   * Enforcing the reset default configuration of clock tree. 
+   */  
   /* Setting Slow Clock source to OSCRC. */
   SCKC->SCKC_CR = 0U;
 
@@ -110,12 +122,10 @@ void sama_clock_init(void) {
   /* Counter Clock Source to MOSCRC. */
   PMC->CKGR_MCFR &= ~CKGR_MCFR_CCSS;
 
-}
 
   /*
    * Main oscillator configuration block.
    */
-{
   /* Setting Slow clock source. */
   SCKC->SCKC_CR = SAMA_OSC_SEL;
   while ((SAMA_OSC_SEL && !(PMC->PMC_SR & PMC_SR_OSCSELS)) ||
@@ -139,11 +149,8 @@ void sama_clock_init(void) {
     ;
   mainf = CKGR_MCFR_MAINF(PMC->CKGR_MCFR);
   /*
-   * TODO: check mainf
-   * select alternate clock source if mainf is out of range:
-   * if the system is configured to use crystal osc,
-   * this function should start trying to use crystal osc sources and
-   * should switch to alternate sources if mainf is invalid.
+   * @TODO: add mainf check and eventual clock source fallback. This mechanism
+   * should be activable through a switch.
    */
   (void)mainf;
 
@@ -156,12 +163,10 @@ void sama_clock_init(void) {
 #if !SAMA_MOSCRC_ENABLED
   PMC->CKGR_MOR &= ~ CKGR_MOR_MOSCRCEN;
 #endif
-}
 
 /*
  * PLLA configuration block.
  */
-{
   pllar = SAMA_PLLA_ONE | CKGR_PLLAR_PLLACOUNT(0x3F);
 #if SAMA_ACTIVATE_PLLA
   pllar |= CKGR_PLLAR_DIVA_BYPASS | SAMA_PLLA_MUL;
@@ -172,12 +177,10 @@ void sama_clock_init(void) {
   while (!(PMC->PMC_SR & PMC_SR_LOCKA))
     ;                                       /* Waits until PLLA is locked.  */
 #endif
-}
 
 /*
  * Master clock configuration block.
  */
-{
   mckr = PMC->PMC_MCKR;
   mckr &= ~PMC_MCKR_CSS_Msk;
   mckr |= SAMA_MCK_SEL;
@@ -186,7 +189,11 @@ void sama_clock_init(void) {
     ;                                       /* Waits until MCK is stable.   */
 
   mckr &= ~(PMC_MCKR_PRES_Msk | PMC_MCKR_MDIV_Msk | PMC_MCKR_H32MXDIV);
-  mckr |= (SAMA_MCK_PRES | SAMA_MCK_MDIV | SAMA_H64MX_H32MX_DIV);
+  
+  /* Note that prescaler and divider must be changed with separate accesses.*/
+  mckr |= SAMA_MCK_PRES;
+  mckr |= SAMA_MCK_MDIV;
+  mckr |= SAMA_H64MX_H32MX_DIV;
 #if SAMA_PLLADIV2_EN
   mckr |= PMC_MCKR_PLLADIV2;
 #else
@@ -195,8 +202,6 @@ void sama_clock_init(void) {
   PMC->PMC_MCKR = mckr;
   while (!(PMC->PMC_SR & PMC_SR_MCKRDY))
     ;                                       /* Waits until MCK is stable.   */
-
-}
 
   /* Enabling write protection.  */
   pmcEnableWP();

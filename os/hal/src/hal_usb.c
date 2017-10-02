@@ -125,6 +125,7 @@ static bool default_handler(USBDriver *usbp) {
 #endif
     return true;
   case (uint32_t)USB_RTYPE_RECIPIENT_DEVICE | ((uint32_t)USB_REQ_GET_DESCRIPTOR << 8):
+  case (uint32_t)USB_RTYPE_RECIPIENT_INTERFACE | ((uint32_t)USB_REQ_GET_DESCRIPTOR << 8):
     /* Handling descriptor requests from the host.*/
     dp = usbp->config->get_descriptor_cb(usbp, usbp->setup[3],
                                          usbp->setup[2],
@@ -631,6 +632,23 @@ bool usbStallTransmitI(USBDriver *usbp, usbep_t ep) {
 }
 
 /**
+ * @brief   Host wake-up procedure.
+ * @note    It is silently ignored if the USB device is not in the
+ *          @p USB_SUSPENDED state.
+ *
+ * @param[in] usbp      pointer to the @p USBDriver object
+ *
+ * @api
+ */
+void usbWakeupHost(USBDriver *usbp) {
+
+  if (usbp->state == USB_SUSPENDED) {
+    /* Starting host wakeup procedure.*/
+    usb_lld_wakeup_host(usbp);
+  }
+}
+
+/**
  * @brief   USB reset routine.
  * @details This function must be invoked when an USB bus reset condition is
  *          detected.
@@ -828,7 +846,7 @@ void _usb_ep0setup(USBDriver *usbp, usbep_t ep) {
       /* Starts the receive phase.*/
       usbp->ep0state = USB_EP0_OUT_RX;
       osalSysLockFromISR();
-      usbStartReceiveI(usbp, 0, usbp->ep0next, usbp->ep0n);
+      usbStartReceiveI(usbp, 0, (uint8_t *)usbp->ep0next, usbp->ep0n);
       osalSysUnlockFromISR();
     }
     else {

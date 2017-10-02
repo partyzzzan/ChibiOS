@@ -28,6 +28,10 @@
 #ifndef CHMBOXES_H
 #define CHMBOXES_H
 
+#if !defined(CH_CFG_USE_MAILBOXES)
+#define CH_CFG_USE_MAILBOXES                FALSE
+#endif
+
 #if (CH_CFG_USE_MAILBOXES == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
@@ -72,8 +76,8 @@ typedef struct {
  *          mailbox that is part of a bigger structure.
  *
  * @param[in] name      the name of the mailbox variable
- * @param[in] buffer    pointer to the mailbox buffer area
- * @param[in] size      size of the mailbox buffer area
+ * @param[in] buffer    pointer to the mailbox buffer array of @p msg_t
+ * @param[in] size      number of @p msg_t elements in the buffer array
  */
 #define _MAILBOX_DATA(name, buffer, size) {                                 \
   (msg_t *)(buffer),                                                        \
@@ -89,11 +93,11 @@ typedef struct {
 /**
  * @brief   Static mailbox initializer.
  * @details Statically initialized mailboxes require no explicit
- *          initialization using @p chMBInit().
+ *          initialization using @p chMBObjectInit().
  *
  * @param[in] name      the name of the mailbox variable
- * @param[in] buffer    pointer to the mailbox buffer area
- * @param[in] size      size of the mailbox buffer area
+ * @param[in] buffer    pointer to the mailbox buffer array of @p msg_t
+ * @param[in] size      number of @p msg_t elements in the buffer array
  */
 #define MAILBOX_DECL(name, buffer, size)                                    \
   mailbox_t name = _MAILBOX_DATA(name, buffer, size)

@@ -89,10 +89,65 @@
 *****************************************************************************
 
 *** Next ***
+- NEW: Added a new function to RT events chEvtAddEventsI().
+- NEW: Integrated the latest FatFS 0.13 with patches.
+- NEW: Improved RT and NIL test suite to report version numbers and
+       configuration settings.
+- NEW: Added a test suite generator tool written in FTL.
+- NEW: Added a multi-target demo applications for PAL, SPI and USB-CDC
+       showcasing how to manage a project with multiple target boards/devices
+       and handle portability issues.
+- NEW: Added to the HAL USB driver a new function usbWakeupHost() for
+       standby exit.
+- NEW: SPI driver improvements, now it is possible to select different
+       modes for CS line handling.
+- NEW: Implemented PAL enhancements on all existing STM32 ports.
+- NEW: PAL driver enhanced with improved callbacks capability and new
+       synchronous API for edge synchronization.
+- NEW: Added to the serial driver and channels interface a new "control"
+       function that allows to implement extensions in the LLD without
+       touching the high level interface. Conceptually it is similar
+       to Posix ioctl().
+- NEW: Added an argument to PAL events callback. API changed thus this
+       causes a major number change in HAL.
+- NEW: Added shared Eclipse debug configurations for OpenOCD under
+       ./tools/eclipse/debug. Now it is no more required to re-create
+       those each time a new workspace is created, just import the global
+       ChibiOS project in it. The configurations will appear under the
+       Eclipse Tools menu. It is required to create an OPENOCD environment
+       variable pointing to the OpenOCD executable. It will be done in
+       ChibiStudio 20 by default.
+- NEW: Improved the various rules.mk to handle "touching" of all
+       included makefiles, now the makefile is no more assumed to
+       be called "Makefile".
 - NEW: Added to the Makefiles the ability to change the default build,
        dependencies and configuration directories. This makes possible
        to have multiple non-conflicting makefiles in the same project.
        Updated the various platform.mk implementing "smart build" mode.
+- HAL: Fixed various STM32 registry problems (bug #889)(backported to 17.6.2
+       and 16.1.10).
+- LIB: Fixed heap allocator returning unaligned blocks (bug #888)(backported
+       to 17.6.2).
+- NIL: Fixed duplicated entries in NIL documentation (bug #887)(backported
+       to 17.6.1).
+- HAL: Fixed USB GET_DESCRIPTOR not handled for Interface Recipients (bug #885)
+       (backported to 17.6.1 and 16.1.9).
+- RT:  MAILBOX_DECL size parameter is actually a count (bug #884)
+       (backported to 17.6.1 and 16.1.9).
+- HAL: Fixed error in uartReceiveTimeout() and uartSendTimeout() (bug #883)
+       (backported to 17.6.1 and 16.1.9).
+- HAL: Fixed TIMx DBL field macro broken (bug #880)(backported
+       to 17.6.1 and 16.1.9).
+- HAL: Fixed STM32 SPI problem in spi_lld_start() (bug #879)(backported
+       to 17.6.1 and 16.1.9).
+- HAL: Fixed invalid STM32 CAN3 filters initialization (bug #878)
+       (backported to 17.6.1).
+- HAL: Fixed missing CAN definitions in STM32L432 registry entry (bug #877)
+       (backported to 17.6.1).
+- HAL: Fixed missing STM32_TIM_MAX_CHANNELS definition in STM32L0 registry
+       (bug #876)(backported to 17.6.1 and 16.1.9).
+- HAL: Fixed STM32 OTGv1 driver fails on STM32L4 (bug #875)
+       (backported to 17.6.1 and 16.1.9).
 - HAL: Fixed wrong I2S and SAI freq divisor (bug #874)
        (backported to 17.6.1).
 - HAL: Fixed wrong SAI1 and SAI2 clock selection (bug #873)

@@ -197,6 +197,15 @@
  * @{
  */
 /**
+ * @brief   Defines if the code is running in the secure side of the ARM Trust
+ *          Zone. It must be @p TRUE whenever the code is compiled for the
+ *          secure side.
+ */
+#if !defined(SAMA_NO_INIT) || defined(__DOXYGEN__)
+#define SAMA_HAL_IS_SECURE                  TRUE
+#endif
+
+/**
  * @brief   Disables the PMC initialization in the HAL.
  */
 #if !defined(SAMA_NO_INIT) || defined(__DOXYGEN__)
@@ -454,6 +463,24 @@
 #error "H64MX H32MX clock ratio out of range."
 #endif
 
+/**
+ * @brief   UARTx clock.
+ */
+#define SAMA_UART0CLK                       (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+#define SAMA_UART1CLK                       (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+#define SAMA_UART2CLK                       (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+#define SAMA_UART3CLK                       (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+#define SAMA_UART4CLK                       (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+
+/**
+ * @brief   FLEXCOMx clock.
+ */
+#define SAMA_FLEXCOM0CLK                    (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+#define SAMA_FLEXCOM1CLK                    (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+#define SAMA_FLEXCOM2CLK                    (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+#define SAMA_FLEXCOM3CLK                    (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+#define SAMA_FLEXCOM4CLK                    (SAMA_MCK / SAMA_H64MX_H32MX_RATIO)
+
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
 /*===========================================================================*/
@@ -469,7 +496,7 @@
 /* Various helpers.*/
 #include "sama_pmc.h"
 #include "aic.h"
-/* #include "sama_xdmac.h" */
+#include "sama_xdmac.h" 
 
 #ifdef __cplusplus
 extern "C" {
